@@ -1,12 +1,10 @@
-use serde_json::Value;
-
 pub mod dashmap;
 
 pub trait BaseCache {
     fn new() -> Self;
-    fn get_item(&self, key: String) -> Option<Value>;
-    fn set_item(&self, key: String, value: Value);
+    fn get_item(&self, key: String) -> Option<String>;
+    fn set_item(&self, key: String, value: String);
     fn has_item(&self, key: String) -> bool;
-    fn remove_item(&self, key: String) -> Option<Value>;
+    fn remove_item(&self, key: String) -> Option<String>;
     fn keys(&self) -> Vec<String>;
 }

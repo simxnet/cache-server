@@ -7,20 +7,17 @@ mod cache;
 mod routes;
 mod util;
 
-pub struct AppState {
-    cache: Arc<CacheClient>,
-}
+pub type Cache = Arc<CacheClient>;
 
 #[actix_web::main]
 async fn main() -> Result<(), Error> {
-    HttpServer::new(|| {
+    let cache = Arc::new(CacheClient::new());
+
+    HttpServer::new(move || {
+        let cache_clone = cache.clone();
+
         App::new()
-            .app_data(
-                web::Data::new(AppState {
-                    cache: Arc::new(CacheClient::new()),
-                })
-                .clone(),
-            )
+            .app_data(web::Data::new(cache_clone))
             .configure(routes::routes)
     })
     .bind(("0.0.0.0", 8000))?

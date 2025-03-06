@@ -1,21 +1,26 @@
+use std::sync::Arc;
+
 use dashmap::DashMap;
-use serde_json::Value;
 
 use super::BaseCache;
 
+/// DashMap driver
+/// Disclaimer: JSON content should be managed from the app that uses the cache-server. This
+/// can be done using serde_json to convert JSON payload to String
+/// and viceversa.
 #[derive(Clone)]
 pub struct CacheClient {
-    entries: DashMap<String, Value>,
+    entries: Arc<DashMap<String, String>>,
 }
 
 impl BaseCache for CacheClient {
     fn new() -> Self {
         Self {
-            entries: DashMap::new(),
+            entries: Arc::new(DashMap::new()),
         }
     }
 
-    fn get_item(&self, key: String) -> Option<Value> {
+    fn get_item(&self, key: String) -> Option<String> {
         self.entries.get(&key).map(|v| v.clone())
     }
 
@@ -23,11 +28,11 @@ impl BaseCache for CacheClient {
         self.entries.contains_key(&key)
     }
 
-    fn set_item(&self, key: String, value: Value) {
+    fn set_item(&self, key: String, value: String) {
         self.entries.insert(key, value);
     }
 
-    fn remove_item(&self, key: String) -> Option<Value> {
+    fn remove_item(&self, key: String) -> Option<String> {
         self.entries.remove(&key).map(|(_, v)| v)
     }
 
