@@ -5,7 +5,13 @@ edition = "2024"
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
-dashmap = { version = "7.0.0-rc1", features = ["all"] }
 tracing = "0.1.41"
 tracing-subscriber = "0.3.19"
 actix-web = "4.9.0"
+thiserror = "2.0.12"
+actix_error_proc = "1.1.4"
+log = "0.4.26"
+flexi_logger = "0.29.8"
+colored = "3.0.0"
+serde = { version = "1.0.218", features = ["rc"] }
+bytes = "1.10.1"

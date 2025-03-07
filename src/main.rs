@@ -1,24 +1,38 @@
-use std::sync::Arc;
-
-use actix_web::{App, Error, HttpServer, web};
-use cache::{BaseCache, dashmap::CacheClient};
+use std::{sync::Arc, io::Error as IoError};
+use actix_web::{main, web::Data, App, HttpServer};
+use cache::{base_cache::BaseCache, cache_client::CacheClient};
+use flexi_logger::{Logger, FlexiLoggerError};
+use routes::routes as app_routes;
+use thiserror::Error;
+use util::logging::format_log;
 
 mod cache;
 mod routes;
 mod util;
 
-pub type Cache = Arc<CacheClient>;
+/// This acts as an error wrapper
+/// for the main application method,
+/// it essentially is meant to panic
+/// but with error formatting.
+#[derive(Error, Debug)]
+enum AppError {
+    #[error("Error while starting the actix server: {0:#}")]
+    Io(#[from] IoError),
 
-#[actix_web::main]
-async fn main() -> Result<(), Error> {
-    let cache = Arc::new(CacheClient::new());
+    #[error("Error while starting the logger: {0:#}")]
+    Logger(#[from] FlexiLoggerError)
+}
 
-    HttpServer::new(move || {
-        let cache_clone = cache.clone();
+#[main]
+async fn main() -> Result<(), AppError> {
+    Logger::try_with_env_or_str("INFO")?
+        .format(format_log)
+        .start()?;
 
+    HttpServer::new(|| {
         App::new()
-            .app_data(web::Data::new(cache_clone))
-            .configure(routes::routes)
+            .app_data(Data::new(Arc::new(CacheClient::new())))
+            .configure(app_routes)
     })
     .bind(("0.0.0.0", 8000))?
     .run()
