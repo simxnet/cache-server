@@ -7,6 +7,12 @@ routes! {
     route remove_item
 }
 
+/// This route retrieves a CacheClient instance as a 'service'
+/// and acts on behalf of `CacheClient::remove_item` as an HTTP wrapper.
+///
+/// This route removes an item from the cache collection and
+/// returns it with the `200 Ok` along the item in the response
+/// body or `404 Not Found` if the item couldn't be found.
 #[proof_route(delete("/{key:.*}"))]
 pub async fn remove_item(cache: Data<Arc<CacheClient>>, key: Path<String>) -> HttpResult<CacheClientError> {
     let item = cache

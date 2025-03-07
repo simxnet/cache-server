@@ -1,3 +1,4 @@
+
 /// Macro for declaring Actix Web route configurations with a fluent interface.
 ///
 /// # Features

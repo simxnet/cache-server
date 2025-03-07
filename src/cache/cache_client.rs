@@ -5,19 +5,36 @@ use bytes::Bytes;
 use thiserror::Error;
 use tokio::sync::Mutex;
 
+/// This error is used to serialize errors
+/// in the implementation of `BaseCache` for
+/// `CacheClient`, the enumerator implements
+/// `Into<HttpResponse>` as per the `ActixError`
+/// derive to be used within any `proof_route`.
 #[derive(ActixError, Error, Debug)]
 pub enum CacheClientError {
+    /// This error should be returned
+    /// when a required key is not found
+    /// in the internal `CacheClient` collection.
     #[error("An entry with the key \"{0}\" was not found.")]
     #[http_status(NotFound)]
     EntryNotFound(Arc<String>)
 }
 
-#[derive(Clone)]
+/// `CacheClient` is an immutable implementation
+/// of `BaseCache`, being a wrapper to a thread
+/// safe collection.
 pub struct CacheClient {
+    /// `entries` is the internal collection
+    /// for `CacheClient`, it stores an internally
+    /// mutable `HashMap` of shared references
+    /// both key and value.
     entries: Arc<Mutex<HashMap<Arc<String>, Arc<Bytes>>>>,
 }
 
 impl CacheClient {
+    /// This function creates a new instance
+    /// of `CacheClient`, also intializing the
+    /// internal collection.
     pub fn new() -> Self {
         Self {
             entries: Arc::new(Mutex::new(HashMap::new())),

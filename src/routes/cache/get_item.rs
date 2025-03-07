@@ -7,6 +7,12 @@ routes! {
     route get_item
 }
 
+/// This route retrieves a CacheClient instance as a 'service'
+/// and acts on behalf of `CacheClient::get_item` as an HTTP wrapper.
+///
+/// This route returns `200 Ok` if the item could be found,
+/// otherwise `404 Not Found` as per the `ActixError` error
+/// derive on `CacheClientError`.
 #[proof_route(get("/{key:.*}"))]
 pub async fn get_item(cache: Data<Arc<CacheClient>>, key: Path<String>) -> HttpResult<CacheClientError> {
     Ok(

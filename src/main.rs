@@ -10,6 +10,10 @@ mod cache;
 mod routes;
 mod util;
 
+/// This acts as an error wrapper
+/// for the main application method,
+/// it essentially is meant to panic
+/// but with error formatting.
 #[derive(Error, Debug)]
 enum AppError {
     #[error("Error while starting the actix server: {0:#}")]
