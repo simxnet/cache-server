@@ -7,7 +7,7 @@ routes! {
 }
 
 #[put("/{key:.*}")]
-pub async fn set_item<'c>(cache: Data<Arc<CacheClient>>, key: Path<String>, body: Bytes) -> impl Responder {
+pub async fn set_item(cache: Data<Arc<CacheClient>>, key: Path<String>, body: Bytes) -> impl Responder {
     cache
         .as_ref()
         .clone()
@@ -17,6 +17,5 @@ pub async fn set_item<'c>(cache: Data<Arc<CacheClient>>, key: Path<String>, body
         )
         .await;
 
-    HttpResponse::Ok()
-        .body("Value stored")
+    HttpResponse::NoContent()
 }
