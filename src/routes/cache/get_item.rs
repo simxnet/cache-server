@@ -1,17 +1,23 @@
-use actix_web::{HttpResponse, Responder, get, web};
-
-use crate::{BaseCache, Cache, routes};
+use std::sync::Arc;
+use actix_web::{web::{Data, Path}, HttpResponse};
+use crate::{cache::cache_client::CacheClientError, routes, BaseCache, CacheClient};
+use actix_error_proc::{proof_route, HttpResult};
 
 routes! {
     route get_item
 }
 
-#[get("/{key:.*}")]
-pub async fn get_item(state: web::Data<Cache>, path: web::Path<String>) -> impl Responder {
-    let key = path.into_inner();
-
-    match state.get_item(key) {
-        Some(value) => HttpResponse::Ok().json(value),
-        None => HttpResponse::NotFound().body("Key not found"),
-    }
+#[proof_route(get("/{key:.*}"))]
+pub async fn get_item(cache: Data<Arc<CacheClient>>, key: Path<String>) -> HttpResult<CacheClientError> {
+    Ok(
+        HttpResponse::Ok()
+            .body(
+                cache
+                    .as_ref()
+                    .clone()
+                    .get_item(Arc::new(key.into_inner()))
+                    .await?
+                    .to_string()
+            )
+    )
 }

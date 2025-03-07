@@ -1,14 +1,19 @@
-use actix_web::{HttpResponse, Responder, get, web};
-
-use crate::{BaseCache, Cache, routes};
+use std::sync::Arc;
+use actix_web::{get, web::Data, HttpResponse, Responder};
+use crate::{BaseCache, CacheClient, routes};
 
 routes! {
     route get_keys
 }
 
 #[get("/")]
-pub async fn get_keys(state: web::Data<Cache>) -> impl Responder {
-    let keys = state.keys();
-
-    HttpResponse::Ok().json(keys)
+pub async fn get_keys(cache: Data<Arc<CacheClient>>) -> impl Responder {
+    HttpResponse::Ok()
+        .json(
+            cache
+                .as_ref()
+                .clone()
+                .keys()
+                .await
+        )
 }
