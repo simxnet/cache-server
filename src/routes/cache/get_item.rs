@@ -17,7 +17,7 @@ pub async fn get_item(cache: Data<Arc<CacheClient>>, key: Path<String>) -> HttpR
                     .clone()
                     .get_item(Arc::new(key.into_inner()))
                     .await?
-                    .to_string()
+                    .to_vec()
             )
     )
 }

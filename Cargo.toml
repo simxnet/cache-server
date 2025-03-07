@@ -14,3 +14,4 @@ log = "0.4.26"
 flexi_logger = "0.29.8"
 colored = "3.0.0"
 serde = { version = "1.0.218", features = ["rc"] }
+bytes = "1.10.1"

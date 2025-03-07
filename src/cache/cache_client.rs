@@ -1,6 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 use super::base_cache::BaseCache;
 use actix_error_proc::ActixError;
+use bytes::Bytes;
 use thiserror::Error;
 use tokio::sync::Mutex;
 
@@ -13,7 +14,7 @@ pub enum CacheClientError {
 
 #[derive(Clone)]
 pub struct CacheClient {
-    entries: Arc<Mutex<HashMap<Arc<String>, Arc<String>>>>,
+    entries: Arc<Mutex<HashMap<Arc<String>, Arc<Bytes>>>>,
 }
 
 impl CacheClient {
@@ -27,7 +28,7 @@ impl CacheClient {
 impl BaseCache for CacheClient {
     type Error = CacheClientError;
 
-    async fn get_item(self: Arc<Self>, key: Arc<String>) -> Result<Arc<String>, Self::Error> {
+    async fn get_item(self: Arc<Self>, key: Arc<String>) -> Result<Arc<Bytes>, Self::Error> {
         let entries = self
             .entries
             .lock()
@@ -49,7 +50,7 @@ impl BaseCache for CacheClient {
             .contains_key(&key)
     }
 
-    async fn set_item(self: Arc<Self>, key: Arc<String>, value: Arc<String>) {
+    async fn set_item(self: Arc<Self>, key: Arc<String>, value: Arc<Bytes>) {
         let mut entries = self
             .entries
             .lock()
@@ -62,7 +63,7 @@ impl BaseCache for CacheClient {
             );
     }
 
-    async fn remove_item(self: Arc<Self>, key: Arc<String>) -> Result<Arc<String>, Self::Error> {
+    async fn remove_item(self: Arc<Self>, key: Arc<String>) -> Result<Arc<Bytes>, Self::Error> {
         let mut entries = self
             .entries
             .lock()
